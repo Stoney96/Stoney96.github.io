@@ -1,51 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta name="robots" content="noindex">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css">
     <link rel="stylesheet" href="./style.css">
-    <title>Rock paper Scisors game</title>
-    <link rel="icon" href="./assets/icon.svg">
-    <!-- Try website -->
+    <title>To do List</title>
+    
 </head>
-
 <body>
+    
+    <header>
+        <h1>A todo list</h1>
+    </header> 
+ 
+    <form>
+        <input type="text" class="todo-input">
+        <button class="todo-button" type="submit">
+            <i class="fa fa-plus"></i>
+        </button>
 
-    <section class="game">
-        <div class="score"> 
-            <div class="player-score">
-                <h2>Player</h2>
-                <p>0</p>
-            </div>
-            <div class="computer-score">
-                <h2>Computer</h2>
-                <p>0</p>
-            </div>
+        <div class="select">
+            <select name="todos" class="filter-todo">
+                <option value="all">All</option>
+                <option value="completed">Completed</option>
+                <option value="waiting">Waiting</option>
+            </select>
         </div>
 
-        <div class="intro">
-            <h1>Rock Paper and Scissors</h1>
-            <button>Let's Play</button>
-        </div>
+    </form>
 
-        <div class="match fadeOut">
-            <h2 class="winner">Choose an option</h2>
-            <div class="hands">
-                <img class="player-hand" src="./assets/rock.png" alt="">
-                <img class="computer-hand" src="./assets/rock.png" alt="">
-            </div>
-            <div class="options">
-                <button class="rock">rock</button>
-                <button class="paper">paper</button>
-                <button class="scissors">scissors</button>
-            </div>
-        </div>
+    <div class="todo-container">
+        <ul class="todo-list"></ul>
+    </div>
 
-    </section>
-
+    <script src="./app.js"></script>
 </body>
-<script src="app.js"></script>
 </html>

@@ -1,106 +1,185 @@
-const game = () => {
-    let pScore = 0
-    let cScore = 0
+// selectors
+const todoInput = document.querySelector(".todo-input")
+const todoButton = document.querySelector(".todo-button")
+const todoList = document.querySelector(".todo-list")
+const filterOption = document.querySelector(".filter-todo")
 
-    //starts the game
-    const startGame = () => {
-        const playBtn = document.querySelector(".intro button")
-        const introScreen = document.querySelector(".intro")
-        const matchScreen = document.querySelector(".match")
+// event listeners
 
-        playBtn.addEventListener("click", () => {
-            introScreen.classList.add("fadeOut")
-            matchScreen.classList.add("fadeIn")
-        })
-    }
+document.addEventListener("DOMContentLoaded", getTodos())
+todoButton.addEventListener("click", addTodo)
+todoList.addEventListener("click", deleteCheck)
+filterOption.addEventListener("click", filterTodo)
+// functions
 
-    //play the game itslef
+function addTodo(event){
+    // prevents form from submitting
+    event.preventDefault()
+    // console.log("hi")
 
-    const playMatch = () => {
-        const options = document.querySelectorAll(".options button")
-        const playerHands = document.querySelector(".player-hand")
-        const computerHands = document.querySelector(".computer-hand")
-
-        // generate a random number
-        const computerOptions = ["rock", "paper", "scissors"]
-
-        // console.log(options)
-        options.forEach(option => {
-            option.addEventListener("click", function(){
-                // console.log(this.textContent)
-
-                // computer choice
-                const computerNumber = Math.floor((Math.random() * 3))
-                const computerChoice = computerOptions[computerNumber]
-                // console.log(computerChoice)
-
-                playerHands.src = `./assets/${this.textContent}.png`
-                computerHands.src = `./assets/${computerChoice}.png`
-
-                //here is where we call compare hands
-                compareHands(this.textContent, computerChoice)
-                updateScore()
-
-            })     
-        });   
-    }
-
-    const updateScore = () =>{
-        const playerScore = document.querySelector(".player-score p")
-        const computerScore = document.querySelector(".computer-score p")
-
-        playerScore.textContent = pScore
-        computerScore.textContent = cScore
-    }
-
-    const compareHands = (playerChoice, computerChoice) =>{
-
-        const winner = document.querySelector(".winner")
-
-        if (playerChoice === computerChoice){
-            winner.textContent = "It's a tie"
-            return 
-        }
-
-        if (playerChoice === "rock"){
-            if (computerChoice === "scissors"){
-                winner.textContent = "Player wins"
-                pScore+=1
-                return 
-            } else{
-                winner.textContent = "Computer wins"
-                cScore+=1
-                return 
-            }
-        }
-        if (playerChoice === "paper"){
-            if (computerChoice === "rock"){
-                winner.textContent = "Player wins"
-                pScore+=1
-                return 
-            } else{
-                winner.textContent = "Computer wins"
-                cScore+=1
-                return 
-            }
-        }
-        if (playerChoice === "scissors"){
-            if (computerChoice === "paper"){
-                winner.textContent = "Player wins"
-                pScore+=1
-                return 
-            } else{
-                winner.textContent = "Computer wins"
-                cScore+=1
-                return 
-            }
-        }
-
-    }
+    // todo div
+    const todoDiv = document.createElement("div")
+    todoDiv.classList.add("todo")
+    // create an LI
+    const newTodo = document.createElement("li")
+    newTodo.innerText = todoInput.value
     
-    //to actually start the game itself
-    startGame()
-    playMatch()
+    newTodo.classList.add("todo-item")
+    todoDiv.appendChild(newTodo)
+
+    // add todo to local storage
+    saveLocalTodos(todoInput.value)
+    // add a completed button
+    const completedButton = document.createElement("button")
+    completedButton.innerHTML = '<i class="fas fa-check"></i>'
+    completedButton.classList.add("completedButton")
+    todoDiv.appendChild(completedButton)
+
+    // add a deleted button
+    const trashButton = document.createElement("button")
+    trashButton.innerHTML = '<i class="fas fa-trash"></i>'
+    trashButton.classList.add("trashButton")
+    todoDiv.appendChild(trashButton)
+
+    // append to list
+    todoList.appendChild(todoDiv)
+
+    // Clear field value of the input
+    todoInput.value = ""
 }
 
-game()
+
+function deleteCheck(event){
+    const item = event.target
+    const todo = item.parentElement
+    // console.log(item)
+    
+
+    if (item.classList[0] ==="completedButton"){
+        todo.classList.toggle("completedTask")
+    }
+
+    if (item.classList[0] ==="trashButton"){
+        // run animation
+        // todo.completedButton.style.transition = "0.6s"
+        // document.getElementsByClassName("completedButton").style["transition"] = "0.6"
+        
+        todo.classList.add("fade-delete")
+        removeLocalTodos(todo)
+                
+        // when animation is done
+        todo.addEventListener('transitionend', function detect_end(event){
+            // this makes sure that the todo element is deleted after the fade delete is exectuted
+
+            // this finds the last element of the classlist which will always be fade-delete!
+            if(event.path[0].classList[event.path[0].classList.length - 1] === "fade-delete"){
+                todo.remove()
+            }
+        })
+    }
+}
+
+
+// understand why spaces in the ul section confuses this set
+function filterTodo(event){
+    const todos = todoList.childNodes
+ 
+    todos.forEach(function(todo){
+        console.log(event.target.value)
+        console.log(todo.classList.contains("completedTask"))
+
+        switch(event.target.value){
+            case "all":
+                todo.style.display = "flex"
+                break
+            case "completed":
+                if (todo.classList.contains("completedTask")){
+                    todo.style.display = "flex"
+                }else{
+                    todo.style.display = "none"
+                }
+                break
+            case "waiting":
+                
+                if (!todo.classList.contains("completedTask")){
+                    todo.style.display = "flex"
+                }else{
+                    todo.style.display = "none"
+                }
+                break
+        }
+    })
+}
+
+// ***************************************************
+// ***************************************************
+// ***************************************************
+// ***************************************************
+// study this section way more in depth
+// ***************************************************
+// ***************************************************
+// ***************************************************
+// ***************************************************
+function saveLocalTodos(todo){
+    // check if there is already a downloaded todo
+
+    let todos
+    if(localStorage.getItem("todos") === null){
+        todos = []
+    } else{
+        todos = JSON.parse(localStorage.getItem("todos"))
+    }
+    todos.push(todo)
+    localStorage.setItem("todos", JSON.stringify(todos))
+}
+
+function getTodos(){
+    let todos
+    if(localStorage.getItem("todos") === null){
+        todos = []
+    } else{
+        todos = JSON.parse(localStorage.getItem("todos"))
+    }
+
+    todos.forEach(function(todo){
+
+        // todo div
+        const todoDiv = document.createElement("div")
+        todoDiv.classList.add("todo")
+        // create an LI
+        const newTodo = document.createElement("li")
+        newTodo.innerText = todo
+        
+        newTodo.classList.add("todo-item")
+        todoDiv.appendChild(newTodo)
+
+        // add a completed button
+        const completedButton = document.createElement("button")
+        completedButton.innerHTML = '<i class="fas fa-check"></i>'
+        completedButton.classList.add("completedButton")
+        todoDiv.appendChild(completedButton)
+
+        // add a deleted button
+        const trashButton = document.createElement("button")
+        trashButton.innerHTML = '<i class="fas fa-trash"></i>'
+        trashButton.classList.add("trashButton")
+        todoDiv.appendChild(trashButton)
+
+        // append to list
+        todoList.appendChild(todoDiv)
+
+    })
+
+}
+
+function removeLocalTodos(todo){
+    let todos
+    if(localStorage.getItem("todos") === null){
+        todos = []
+    } else{
+        todos = JSON.parse(localStorage.getItem("todos"))
+    }
+    // console.log(todos.indexOf(todo.children[0].innerText))
+    todos.splice(todos.indexOf(todo.children[0].innerText),1)
+    localStorage.setItem("todos",JSON.stringify(todos))
+}
